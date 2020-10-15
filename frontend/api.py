@@ -1,6 +1,6 @@
 from os.path import join
-
-from flask import Flask, send_file, render_template, request
+from youtube_dl.utils import DownloadError
+from flask import Flask, send_file, render_template, request, Response
 
 from .api_settings import HOMEPAGE, DOWNLOAD_PAGE
 from backend.downloader import download_url, DESTINATION
@@ -17,10 +17,17 @@ def home():
 
 
 @app.route(DOWNLOAD_PAGE)
-def get(url: str):
+def get():
     
-    file_name = download_url(url)
+    url = request.args.get('url')
+    if url is None:
+        return Response('Url not provided', status=400)
+
+    try:
+        file_name = download_url(url)
+    except DownloadError:
+        return Response(f'Invalid url: "{url}"', status=422)
     
-    return send_file(join(DESTINATION, file_name), attachment_filename=file_name)
+    return send_file(join(DESTINATION, file_name), attachment_filename=file_name, as_attachment=True)
 
     

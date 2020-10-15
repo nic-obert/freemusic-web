@@ -23,7 +23,7 @@ static PyObject* c_rename_file
     // ALGORITHM FOR STRING REMOVAL
 
     // name = songTitle.lower()
-    strIndex titleLength = strlen(constSongTitle);
+    strIndex titleLength = strlen(constSongTitle) + 1;
     char name[titleLength];
     char songTitle[titleLength];
     for (strIndex c = 0; c != titleLength; c++)
