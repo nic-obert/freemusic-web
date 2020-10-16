@@ -1,115 +1,110 @@
 #define PY_SSIZE_T_CLEAN
 #include <python3.6m/Python.h>
 
-#include <ctype.h>
 #include <string.h>
-
-#include "to_remove.c"
-
-#define bool char
-#define true 1
-#define false 0
-#define strIndex unsigned char
 
 
 static PyObject* c_rename_file
 (PyObject* self, PyObject* args)
 {
     const char* constSongTitle;
-    char* subIndexPtr;
 
     PyArg_ParseTuple(args, "s", &constSongTitle);
 
     // ALGORITHM FOR STRING REMOVAL
 
-    // name = songTitle.lower()
-    strIndex titleLength = strlen(constSongTitle) + 1;
-    char name[titleLength];
+    unsigned char titleLength = strlen(constSongTitle) + 1;
     char songTitle[titleLength];
-    for (strIndex c = 0; c != titleLength; c++)
+
+    char* subIndex = (char*)songTitle;
+
+    // copy song title
+    for (; *constSongTitle != '\0'; ++constSongTitle)
     {
-        name[c] = tolower(constSongTitle[c]);
-        songTitle[c] = constSongTitle[c];
-    }
-    name[titleLength] = '\0';
-    songTitle[titleLength] = '\0';
-
-
-    // remove substings
-
-    // repeat until there is no substring left
-    bool noMatch = true;
-    do {
-        noMatch = true;
-        for (strIndex sub = 0; sub < TO_REMOVE_LENGTH; sub++)
-        {
-            // if substring is not found --> continue on the loop
-            if ((subIndexPtr = strstr(name, to_remove[sub])) == NULL)
-                continue;
-
-            noMatch = false; // this will make the loop repeat
-            
-            // get the subIndex of the other string
-            strIndex subIndex = subIndexPtr - name;
-
-            // get the end pointer of substring to remove
-            strIndex subLength = strlen(to_remove[sub]);
-            strIndex subEnd = subIndex + subLength;
-
-            // remove substring from songTitle
-            for (; songTitle[subEnd]; ++subEnd)
-            {
-                songTitle[subIndex] = songTitle[subEnd];
-                name[subIndex] = songTitle[subEnd];
-                subIndex ++;
-            }
-            songTitle[subIndex] = '\0';     
-            name[subIndex] = '\0';   
-
-        }
-    } while (!noMatch);
-
-    // remove one char long substrings (redundant spaces, quotes)
-    char previous = 0;
-    strIndex nameIndex = 0;
-    for (strIndex i = 0; songTitle[i]; i++)
-    {
-        // if space is redundant --> just continue on the loop
-        if (songTitle[i] == ' ')
-        {
-            if (previous == ' ')
-                continue;
-
-            // check if next char is a '.' (file extension) --> remove trailing space
-            if (songTitle[i+1] == '.')
-                continue;
-
-        }
-        // in case of multiple trailing spaces before '.' (file extension)
-        else if (songTitle[i] == '.' && previous == ' ')
-        {
-            name[nameIndex-1] = '.';
-            previous = '.';
+        // ignore quotes (both double and single)
+        if (*constSongTitle == '\''
+            || *constSongTitle == '"')
             continue;
-        }
-
-        // remove single quotes and double quotes from song title
-        else if (songTitle[i] == '"') continue;
-        else if (songTitle[i] == '\'') continue;
-
-            
         
-        // copy character
-        name[nameIndex] = songTitle[i];
-        nameIndex ++;
-        
-        previous = songTitle[i];
+        *subIndex = *constSongTitle;
+        ++ subIndex;
     }
-    // finally add the null termination character
-    name[nameIndex] = '\0';
+    // add null termination character
+    *subIndex = '\0';
+    subIndex = (char*)songTitle;
+    
+
+    // remove text between parenthesis and redundant spaces
+    char* copyIndex = subIndex;
+
+    for (; *subIndex != '\0'; ++subIndex)
+    {
+        if (*subIndex == '(')
+        {
+            char* endParen;
+            // find the index of closing parenthesis
+            if ((endParen = strstr(subIndex+1, ")")) == NULL)
+                continue;
+            
+            // set to null character for strstr
+            *endParen = '\0';
+
+            // search for "feat " and "ft " substrings
+            if (strstr(subIndex+1, "feat ") != NULL
+                || strstr(subIndex+1, "ft ") != NULL)
+            {
+                // restore string integrity
+                *endParen = ')';
+            }
+            else {
+                // if "feat " and "ft " are not between parenthesis
+                subIndex = endParen + 1;
+            }
+
+        }
+        else if (*subIndex == '[')
+        {
+            char* endBrack;
+            // find the index of closing square brackets
+            if ((endBrack = strstr(subIndex+1, "]")) == NULL)
+                continue;
+            
+            // set to null character for strstr
+            *endBrack = '\0';
+
+            // search for "feat " and "ft " substrings
+            if (strstr(subIndex+1, "feat ") != NULL
+                || strstr(subIndex+1, "ft ") != NULL)
+            {
+                // restore string integrity
+                *endBrack = ']';
+            }
+            else {
+                // if "feat " and "ft " are not between brackets
+                subIndex = endBrack + 1;
+            }
+
+        }
+        // remove redundant spaces
+        else if (*subIndex == ' ')
+        {
+            // ignore space if next character is also a space
+            // or if next character is a dot (file extension)
+            if (*(subIndex + 1) == ' '
+                || *(subIndex + 1) == '.')
+                continue;
+        }
+        
+
+        // finally copy the character if it was not ignored
+        *copyIndex = *subIndex;
+        ++ copyIndex;
+    }
+    // finally add null termination character
+    *copyIndex = '\0';
 
 
-    return PyUnicode_FromString(name);
+    return PyUnicode_FromString(songTitle);
 
 }
 
