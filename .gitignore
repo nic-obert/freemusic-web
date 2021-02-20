@@ -2,3 +2,5 @@ __pycache__
 *.pyc
 .venv
 music/*.m4a
+.vscode
+-e .
