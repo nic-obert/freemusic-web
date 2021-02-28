@@ -23,8 +23,16 @@ def get():
     if url is None:
         return Response('Url not provided', status=400)
 
+    download_type = request.args.get('downloadtype')
+    if download_type is None:
+        return Response('Download type not provided. Choose between "video" and "audio"', status=400)
+
+    auto_rename = request.args.get('autorename')
+    if auto_rename is None:
+        auto_rename = False
+
     try:
-        file_name = download_url(url)
+        file_name = download_url(url, download_type, auto_rename)
     except DownloadError:
         return Response(f'Invalid url: "{url}"', status=422)
     

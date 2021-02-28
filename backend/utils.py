@@ -2,7 +2,6 @@
     Useful functions for fmserver
 """
 
-from socket import socket, AF_INET, SOCK_DGRAM
 from backend import settings
 
 
@@ -45,7 +44,7 @@ else:
                 song = song[:paren_index] + song[closing_paren + 1:]
             
         
-        # remove redundand spaces and trailing spaces, the  return
+        # remove redundand spaces and trailing spaces, then return
         return song.replace('  ', '').replace(' .', '.')
 
 

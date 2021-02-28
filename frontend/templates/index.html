@@ -14,9 +14,27 @@
     <br>
 
     <form action="/get" method="get">
-    <label for="url">Url: </label>
-    <input type="text" name="url" id="url" onfocus="this.select()" autocomplete="off">
-    <input type="submit" value="Get Music">
+        <label for="url">Url: </label>
+        <input type="text" name="url" id="url" onfocus="this.select()" autocomplete="off">
+        <input type="submit" value="Get Music">
+
+        <br>
+        <br>
+
+        <label for="downloadtype">Download type:</label>
+        <br>
+        <label for="typevideo">Video</label>
+        <input type="radio" name="downloadtype" id="typevideo" value="video">
+        <br>
+        <label for="typeaudio">Audio</label>
+        <input type="radio" name="downloadtype" id="typeaudio" value="audio" checked="true">
+
+        <br>
+        <br>
+
+        <label for="autorename">Auto rename</label>
+        <input type="checkbox" name="autorename" id="autorename" checked="true">
+        
     </form>
 
     <br>
