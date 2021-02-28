@@ -2,7 +2,8 @@
     Settings file for fmserver
 """
 
-from os import getenv
+from os import getenv, getcwd
+from os.path import join
 from sys import argv
 
 
@@ -29,4 +30,4 @@ if '-d' in argv:
 else:
     DESTINATION = getenv('FMDESTINATION')
     if not DESTINATION:
-        DESTINATION = getenv('HOME')
+        DESTINATION = getcwd()
