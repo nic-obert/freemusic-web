@@ -27,8 +27,8 @@ DOWNLOADER_OPTIONS_VIDEO = {
 # get the destination to download the files to
 if '-d' in argv:
     DESTINATION = argv[argv.index('-d') + 1]
-elif 'music' in listdir(getcwd):
-    DESTINATION = join(getcwd, 'music')
+elif 'music' in listdir(getcwd()):
+    DESTINATION = join(getcwd(), 'music')
 else:
     DESTINATION = getenv('FMDESTINATION')
     if not DESTINATION:
