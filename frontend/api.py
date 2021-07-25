@@ -9,7 +9,6 @@ from backend.downloader import download_url, DESTINATION
 app = Flask(__name__)
 
 
-
 @app.route(HOMEPAGE)
 def home():
    

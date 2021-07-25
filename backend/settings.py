@@ -17,6 +17,17 @@ DOWNLOADER_OPTIONS_AUDIO = {
     'outtmpl': '%(title)s.%(ext)s'
 }
 
+DOWNLOADER_OPTIONS_YT_MUSIC = {
+    'format': 'bestaudio[ext=m4a]',
+    'quiet': True,
+    'outtmpl': '%(artist)s - %(title)s.%(ext)s',
+    'writethumbnail': True,
+    'postprocessors': [
+        {'key': 'EmbedThumbnail'},
+        {'key': 'FFmpegMetadata'}
+    ]
+}
+
 DOWNLOADER_OPTIONS_VIDEO = {
     'format': 'best',
     'quiet': True,
